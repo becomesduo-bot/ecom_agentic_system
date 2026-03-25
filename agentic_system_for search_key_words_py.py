@@ -136,7 +136,7 @@ in_put = st.text_input("Search Keyword", key="search_keyword")
 if in_put:
     try:
         ans = ResearchCrew().crew().kickoff(inputs={"query": in_put})
-        st.write(ans)
+        st.write(ans['result'])
     except Exception as e:
         st.error(f"Error running CrewAI: {e}")
 else:
