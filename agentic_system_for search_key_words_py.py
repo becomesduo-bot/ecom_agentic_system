@@ -81,17 +81,17 @@ class ResearchCrew:
     tasks_config = "config/configtasks.yaml"
 
    
-   @agent
-   def research_master_agent(self) -> Agent:
-       return Agent(
+    @agent
+    def research_master_agent(self) -> Agent:
+        return Agent(
         config=self.agents_config['research_master_agent'],
         tools=[DummyJSONTool(), FakeStoreTool(), EscuelajsTool()],
         verbose=True
-     )
+      )
 
-   @agent
-   def llm_agent(self) -> Agent:
-       return Agent(
+    @agent
+    def llm_agent(self) -> Agent:
+        return Agent(
         config=self.agents_config['llm_agent'],
         llm=LLM(
             model="gpt-4o-mini",
@@ -99,22 +99,22 @@ class ResearchCrew:
             api_key=st.secrets["OPENAI_API_KEY"]
         ),
         verbose=True
-     )
+      )
 
-   @task
-   def research_task(self) -> Task:
-       return Task(
+    @task
+    def research_task(self) -> Task:
+        return Task(
         config=self.tasks_config['research_task'],
         agent=self.research_master_agent()
-     )
+      )
 
-   @task
-   def analysis_task(self) -> Task:
-       return Task(
+    @task
+    def analysis_task(self) -> Task:
+        return Task(
         config=self.tasks_config['analysis_task'],
         agent=self.llm_agent(),
         output_file='output/report.md'
-     )
+      )
    
     @crew
     def crew(self) -> Crew:
