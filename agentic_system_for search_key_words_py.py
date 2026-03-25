@@ -81,35 +81,40 @@ class ResearchCrew:
     tasks_config = "config/configtasks.yaml"
 
    
-    @agent
-    def research_master_agent(self) -> Agent:
-        return Agent(
-            tools=[DummyJSONTool(), FakeStoreTool(), EscuelajsTool()],
-            verbose=True
-        )
+   @agent
+   def research_master_agent(self) -> Agent:
+       return Agent(
+        config=self.agents_config['research_master_agent'],
+        tools=[DummyJSONTool(), FakeStoreTool(), EscuelajsTool()],
+        verbose=True
+     )
 
-    @agent
-    def llm_agent(self) -> Agent:
-        return Agent(
-            llm=LLM(
-                model="gpt-4o-mini",
-                temperature=0.7,
-                api_key=st.secrets["OPENAI_API_KEY"]
-            ),
-            verbose=True
-        )
+   @agent
+   def llm_agent(self) -> Agent:
+       return Agent(
+        config=self.agents_config['llm_agent'],
+        llm=LLM(
+            model="gpt-4o-mini",
+            temperature=0.7,
+            api_key=st.secrets["OPENAI_API_KEY"]
+        ),
+        verbose=True
+     )
 
-    
-    @task
-    def research_task(self) -> Task:
-        return Task()  
+   @task
+   def research_task(self) -> Task:
+       return Task(
+        config=self.tasks_config['research_task'],
+        agent=self.research_master_agent()
+     )
 
-    @task
-    def analysis_task(self) -> Task:
-        output_dir = os.path.join(os.getcwd(), "output")
-        os.makedirs(output_dir, exist_ok=True)
-        return Task(output_file=os.path.join(output_dir, 'report.md'))  
-
+   @task
+   def analysis_task(self) -> Task:
+       return Task(
+        config=self.tasks_config['analysis_task'],
+        agent=self.llm_agent(),
+        output_file='output/report.md'
+     )
    
     @crew
     def crew(self) -> Crew:
