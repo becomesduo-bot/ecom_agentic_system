@@ -68,7 +68,7 @@ class EscuelajsTool(BaseTool):
                 return "No products found for this keyword."
             return "\n".join([f"{p['title']} - ${p['price']}" for p in data[:5]])
         except Exception as e:
-            return f"Error: {str(e)}
+            return f"Error: {str(e)}"
 
 
 
