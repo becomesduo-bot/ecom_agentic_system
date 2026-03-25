@@ -10,14 +10,15 @@ Original file is located at
     https://colab.research.google.com/drive/1N0k6Hzx4dr-k_Ry1vrESH-z3AWUebZFX
 """
 
+# -*- coding: utf-8 -*-
 import os
 import requests
-from typing import List
 from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.tools import BaseTool
 import streamlit as st
 import yaml
+
 
 class DummyJSONTool(BaseTool):
     name: str = "DummyJSON API Tool"
@@ -75,19 +76,23 @@ class EscuelajsTool(BaseTool):
 class ResearchCrew():
     """Research crew for e-commerce product fetching and reporting"""
 
-    agents_config_path = "configagents.yaml"
-    tasks_config_path = "configtasks.yaml"
+    agents_config_path = "config/agents.yaml"
+    tasks_config_path = "config/tasks.yaml"
+
     def __init__(self):
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        agents_path = os.path.join(BASE_DIR, "config", "agents.yaml")
+        tasks_path = os.path.join(BASE_DIR, "config", "tasks.yaml")
 
-        agents_path = os.path.join(BASE_DIR, "configagents.yaml")
-        tasks_path = os.path.join(BASE_DIR, "configtasks.yaml")
-
+        
         with open(agents_path, "r") as f:
             self.agents_config = yaml.safe_load(f)
 
+       
         with open(tasks_path, "r") as f:
             self.tasks_config = yaml.safe_load(f)
+
+   
     @agent
     def research_master_agent(self) -> Agent:
         return Agent(
@@ -108,6 +113,7 @@ class ResearchCrew():
             verbose=True
         )
 
+    
     @task
     def research_task(self) -> Task:
         return Task(
@@ -117,34 +123,32 @@ class ResearchCrew():
 
     @task
     def analysis_task(self) -> Task:
-        os.makedirs("output", exist_ok=True)
-
+        output_dir = os.path.join(os.getcwd(), "output")
+        os.makedirs(output_dir, exist_ok=True)
         return Task(
-        config=self.tasks_config['analysis_task'],
-        agent=self.llm_agent(),
-        output_file='output/report.md'
+            config=self.tasks_config['analysis_task'],
+            agent=self.llm_agent(),
+            output_file=os.path.join(output_dir, 'report.md')
         )
 
+   
     @crew
     def crew(self) -> Crew:
         return Crew(
-            agents=self.agents,
-            tasks=self.tasks,
+            agents=[self.research_master_agent(), self.llm_agent()],
+            tasks=[self.research_task(), self.analysis_task()],
             process=Process.sequential,
             verbose=True,
         )
-
 
 
 st.title("E-Commerce Product Research and Analysis")
 st.subheader("Powered by CrewAI")
 st.write("Enter a keyword to search for products:")
 
-
 in_put = st.text_input("Search Keyword", key="search_keyword")
 
 if in_put:
-
     ans = ResearchCrew().crew().kickoff(inputs={"query": in_put})
     st.write(ans)
 else:
