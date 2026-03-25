@@ -9,7 +9,7 @@ Original file is located at
     https://colab.research.google.com/drive/1N0k6Hzx4dr-k_Ry1vrESH-z3AWUebZFX
 """
 
-# -*- coding: utf-8 -*-
+
 # -*- coding: utf-8 -*-
 import os
 import requests
@@ -114,8 +114,8 @@ class ResearchCrew:
     @crew
     def crew(self) -> Crew:
         return Crew(
-            agents=self.agents,   # auto-collected
-            tasks=self.tasks,     # auto-collected
+            agents=self.agents,   
+            tasks=self.tasks,     
             process=Process.sequential,
             verbose=True,
         )
