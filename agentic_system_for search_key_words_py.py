@@ -10,8 +10,7 @@ Original file is located at
 """
 
 # -*- coding: utf-8 -*-
-
-
+# -*- coding: utf-8 -*-
 import os
 import requests
 from crewai import Agent, Crew, Process, Task, LLM
@@ -69,7 +68,7 @@ class EscuelajsTool(BaseTool):
                 return "No products found for this keyword."
             return "\n".join([f"{p['title']} - ${p['price']}" for p in data[:5]])
         except Exception as e:
-            return f"Error: {str(e)}"
+            return f"Error: {str(e)}
 
 
 
@@ -77,15 +76,14 @@ class EscuelajsTool(BaseTool):
 class ResearchCrew:
     """Research crew for e-commerce product fetching and reporting"""
 
-    
+   
     agents_config = "config/configagents.yaml"
     tasks_config = "config/configtasks.yaml"
 
-    
+   
     @agent
     def research_master_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['research_master_agent'],
             tools=[DummyJSONTool(), FakeStoreTool(), EscuelajsTool()],
             verbose=True
         )
@@ -93,7 +91,6 @@ class ResearchCrew:
     @agent
     def llm_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['llm_agent'],
             llm=LLM(
                 model="gpt-4o-mini",
                 temperature=0.7,
@@ -102,30 +99,23 @@ class ResearchCrew:
             verbose=True
         )
 
-  
+    
     @task
     def research_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['research_task'],
-            agent=self.research_master_agent 
-        )
+        return Task()  
 
     @task
     def analysis_task(self) -> Task:
         output_dir = os.path.join(os.getcwd(), "output")
         os.makedirs(output_dir, exist_ok=True)
-        return Task(
-            config=self.tasks_config['analysis_task'],
-            agent=self.llm_agent,  
-            output_file=os.path.join(output_dir, 'report.md')
-        )
+        return Task(output_file=os.path.join(output_dir, 'report.md'))  
 
-    
+   
     @crew
     def crew(self) -> Crew:
         return Crew(
-            agents=self.agents,   
-            tasks=self.tasks,     
+            agents=self.agents,   # auto-collected
+            tasks=self.tasks,     # auto-collected
             process=Process.sequential,
             verbose=True,
         )
@@ -146,3 +136,6 @@ if in_put:
         st.error(f"Error running CrewAI: {e}")
 else:
     st.write("Please enter a keyword to search.")
+
+
+    
